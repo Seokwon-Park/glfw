@@ -1,0 +1,12 @@
+﻿  null_init.c
+D:\dev\Steins\Steins\vendor\GLFW\include\GLFW\glfw3.h(3160,1): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+  null_joystick.c
+D:\dev\Steins\Steins\vendor\GLFW\include\GLFW\glfw3.h(3160,1): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+  null_monitor.c
+D:\dev\Steins\Steins\vendor\GLFW\include\GLFW\glfw3.h(3160,1): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+  null_window.c
+D:\dev\Steins\Steins\vendor\GLFW\include\GLFW\glfw3.h(3160,1): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+  platform.c
+D:\dev\Steins\Steins\vendor\GLFW\include\GLFW\glfw3.h(3160,1): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+  Generating Code...
+  GLFW.vcxproj -> D:\dev\Steins\Steins\vendor\GLFW\bin\Debug-windows-x86_64\GLFW\GLFW.lib
