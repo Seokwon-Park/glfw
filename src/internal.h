@@ -914,6 +914,7 @@ GLFWproc _glfwPlatformGetModuleSymbol(void* module, const char* name);
 void _glfwInputWindowFocus(_GLFWwindow* window, GLFWbool focused);
 void _glfwInputWindowPos(_GLFWwindow* window, int xpos, int ypos);
 void _glfwInputWindowSize(_GLFWwindow* window, int width, int height);
+void _glfwInputTitleBarHitTest(_GLFWwindow* window, int posX, int posY, int* hit);
 void _glfwInputFramebufferSize(_GLFWwindow* window, int width, int height);
 void _glfwInputWindowContentScale(_GLFWwindow* window,
                                   float xscale, float yscale);

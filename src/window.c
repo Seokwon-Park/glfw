@@ -99,8 +99,8 @@ void _glfwInputWindowSize(_GLFWwindow* window, int width, int height)
 //
 void _glfwInputTitleBarHitTest(_GLFWwindow* window, int posX, int posY, int* hit)
 {
-	if (window->callbacks.tbhittest)
-		window->callbacks.tbhittest((GLFWwindow*)window, posX, posY, hit);
+    if (window->callbacks.tbhittest)
+        window->callbacks.tbhittest((GLFWwindow*)window, posX, posY, hit);
 }
 
 // Notifies shared code that a window has been iconified or restored
