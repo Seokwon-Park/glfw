@@ -36,6 +36,7 @@
 #include <string.h>
 #include <windowsx.h>
 #include <shellapi.h>
+#include <uxtheme.h>
 
 // Returns the window style for the specified window
 //
@@ -529,6 +530,9 @@ static void maximizeWindowManually(_GLFWwindow* window)
 //
 static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    static RECT border_thickness = { 4,4,4,4 };
+    BOOL hasThickFrame = GetWindowLongPtr(hWnd, GWL_STYLE) & WS_THICKFRAME;
+
     _GLFWwindow* window = GetPropW(hWnd, L"GLFW");
     if (!window)
     {
@@ -548,8 +552,57 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             }
         }
 
-        return DefWindowProcW(hWnd, uMsg, wParam, lParam);
+		switch (uMsg)
+		{
+		case WM_CREATE:
+		{
+			if (_glfw.hints.window.titlebar)
+				break;
+
+			//find border thickness
+			SetRectEmpty(&border_thickness);
+			if (GetWindowLongPtr(hWnd, GWL_STYLE) & WS_THICKFRAME)
+			{
+				AdjustWindowRectEx(&border_thickness, GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_CAPTION, FALSE, NULL);
+				border_thickness.left *= -1;
+				border_thickness.top *= -1;
+			}
+			else// if (GetWindowLongPtr(hWnd, GWL_STYLE) & WS_BORDER)
+			{
+				SetRect(&border_thickness, 4, 4, 4, 4);
+			}
+
+			MARGINS margins = { 0 };
+			DwmExtendFrameIntoClientArea(hWnd, &margins);
+			SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+
+			break;
+		}
+
+		case WM_ACTIVATE:
+		{
+			if (_glfw.hints.window.titlebar)
+				break;
+
+			// Extend the frame into the client area.
+			MARGINS margins = { 0 };
+			auto hr = DwmExtendFrameIntoClientArea(hWnd, &margins);
+
+			if (!SUCCEEDED(hr))
+			{
+				// Handle the error.
+			}
+
+			break;
+		}
+		}
+
+		return DefWindowProcW(hWnd, uMsg, wParam, lParam);	
     }
+
+
+
+
 
     switch (uMsg)
     {
@@ -996,6 +1049,29 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
             break;
         }
+
+        case WM_NCCALCSIZE:
+		{
+			if (_glfw.hints.window.titlebar || !hasThickFrame || !wParam)
+				break;
+
+
+            // For custom frames
+
+            const int resizeBorderX = GetSystemMetrics(SM_CXFRAME);
+            const int resizeBorderY = GetSystemMetrics(SM_CYFRAME);
+
+            NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
+            RECT* requestedClientRect = params->rgrc;
+
+            requestedClientRect->right -= resizeBorderX;
+            requestedClientRect->left += resizeBorderX;
+            requestedClientRect->bottom-= resizeBorderY;
+
+            requestedClientRect->top += resizeBorderY;
+
+            return WVR_ALIGNTOP | WVR_ALIGNLEFT;
+		}
 
         case WM_SIZE:
         {
@@ -1815,7 +1891,7 @@ void _glfwSetWindowMonitorWin32(_GLFWwindow* window,
 
     _glfwInputWindowMonitor(window, monitor);
 
-    if (window->monitor)
+	if (window->monitor)
     {
         MONITORINFO mi = { sizeof(mi) };
         UINT flags = SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOCOPYBITS;
@@ -1941,6 +2017,11 @@ void _glfwSetWindowDecoratedWin32(_GLFWwindow* window, GLFWbool enabled)
     updateWindowStyles(window);
 }
 
+void _glfwSetWindowTitlebarWin32(_GLFWwindow* window, GLFWbool enabled)
+{
+	updateWindowStyles(window);
+}
+
 void _glfwSetWindowFloatingWin32(_GLFWwindow* window, GLFWbool enabled)
 {
     const HWND after = enabled ? HWND_TOPMOST : HWND_NOTOPMOST;
@@ -1999,7 +2080,7 @@ void _glfwSetWindowOpacityWin32(_GLFWwindow* window, float opacity)
     if (opacity < 1.f || (exStyle & WS_EX_TRANSPARENT))
     {
         const BYTE alpha = (BYTE) (255 * opacity);
-        exStyle |= WS_EX_LAYERED;
+        exStyle |= WS_EX_LAYERED; 
         SetWindowLongW(window->win32.handle, GWL_EXSTYLE, exStyle);
         SetLayeredWindowAttributes(window->win32.handle, 0, alpha, LWA_ALPHA);
     }
