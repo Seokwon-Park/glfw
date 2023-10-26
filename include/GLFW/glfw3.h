@@ -936,6 +936,18 @@ extern "C" {
                                           */
 #define GLFW_MOUSE_PASSTHROUGH      0x0002000D
 
+                                          /*! @brief Initial position x-coordinate window hint.
+                                           *
+                                           *  Initial position x-coordinate [window hint](@ref GLFW_POSITION_X).
+                                           */
+#define GLFW_POSITION_X             0x0002000E
+
+                                           /*! @brief Initial position y-coordinate window hint.
+                                            *
+                                            *  Initial position y-coordinate [window hint](@ref GLFW_POSITION_Y).
+                                            */
+#define GLFW_POSITION_Y             0x0002000F
+
                                           /*! @brief Framebuffer bit depth hint.
                                            *
                                            *  Framebuffer bit depth [hint](@ref GLFW_RED_BITS).
@@ -1114,6 +1126,12 @@ extern "C" {
                                                                             */
 #define GLFW_X11_INSTANCE_NAME      0x00024002
 #define GLFW_WIN32_KEYBOARD_MENU    0x00025001
+                                                                            /*! @brief Wayland specific
+                                                                             *  [window hint](@ref GLFW_WAYLAND_APP_ID_hint).
+                                                                             *
+                                                                             *  Allows specification of the Wayland app_id.
+                                                                             */
+#define GLFW_WAYLAND_APP_ID         0x00026001
                                                                             /*! @} */
 
 #define GLFW_NO_API                          0
@@ -1137,6 +1155,7 @@ extern "C" {
 #define GLFW_CURSOR_NORMAL          0x00034001
 #define GLFW_CURSOR_HIDDEN          0x00034002
 #define GLFW_CURSOR_DISABLED        0x00034003
+#define GLFW_CURSOR_CAPTURED        0x00034004
 
 #define GLFW_ANY_RELEASE_BEHAVIOR            0
 #define GLFW_RELEASE_BEHAVIOR_FLUSH 0x00035001
@@ -1153,6 +1172,12 @@ extern "C" {
 #define GLFW_ANGLE_PLATFORM_TYPE_D3D11   0x00037005
 #define GLFW_ANGLE_PLATFORM_TYPE_VULKAN  0x00037007
 #define GLFW_ANGLE_PLATFORM_TYPE_METAL   0x00037008
+
+#define GLFW_WAYLAND_PREFER_LIBDECOR    0x00038001
+#define GLFW_WAYLAND_DISABLE_LIBDECOR   0x00038002
+
+#define GLFW_ANY_POSITION           0x80000000
+
 
 /*! @defgroup shapes Standard cursor shapes
  *  @brief Standard system cursor shapes.
@@ -1295,6 +1320,11 @@ extern "C" {
        *  X11 specific [init hint](@ref GLFW_X11_XCB_VULKAN_SURFACE_hint).
        */
 #define GLFW_X11_XCB_VULKAN_SURFACE 0x00052001
+       /*! @brief Wayland specific init hint.
+        *
+        *  Wayland specific [init hint](@ref GLFW_WAYLAND_LIBDECOR_hint).
+        */
+#define GLFW_WAYLAND_LIBDECOR       0x00053001
        /*! @} */
 
        /*! @addtogroup init
@@ -1303,6 +1333,7 @@ extern "C" {
          *
          *  Hint value for @ref GLFW_PLATFORM that enables automatic platform selection.
          */
+
 #define GLFW_ANY_PLATFORM           0x00060000
 #define GLFW_PLATFORM_WIN32         0x00060001
 #define GLFW_PLATFORM_COCOA         0x00060002
@@ -6443,6 +6474,7 @@ extern "C" {
  */
 #ifndef GLAPIENTRY
 #define GLAPIENTRY APIENTRY
+#define GLFW_GLAPIENTRY_DEFINED
 #endif
 
  /* -------------------- END SYSTEM/COMPILER SPECIFIC --------------------- */
