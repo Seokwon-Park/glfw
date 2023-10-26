@@ -559,22 +559,21 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			if (_glfw.hints.window.titlebar)
 				break;
 
-			//find border thickness
-			SetRectEmpty(&border_thickness);
-			if (GetWindowLongPtr(hWnd, GWL_STYLE) & WS_THICKFRAME)
+			if (hasThickFrame)
 			{
-				AdjustWindowRectEx(&border_thickness, GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_CAPTION, FALSE, NULL);
-				border_thickness.left *= -1;
-				border_thickness.top *= -1;
-			}
-			else// if (GetWindowLongPtr(hWnd, GWL_STYLE) & WS_BORDER)
-			{
-				SetRect(&border_thickness, 4, 4, 4, 4);
-			}
+				RECT size_rect;
+				GetWindowRect(hWnd, &size_rect);
 
-			MARGINS margins = { 0 };
-			DwmExtendFrameIntoClientArea(hWnd, &margins);
-			SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+				// Inform the application of the frame change to force redrawing with the new
+				// client area that is extended into the title bar
+				SetWindowPos(
+					hWnd, NULL,
+					size_rect.left, size_rect.top,
+					size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
+					SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+				);
+				break;
+			}
 
 			break;
 		}
@@ -584,15 +583,8 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			if (_glfw.hints.window.titlebar)
 				break;
 
-			// Extend the frame into the client area.
-			MARGINS margins = { 0 };
-			auto hr = DwmExtendFrameIntoClientArea(hWnd, &margins);
-
-			if (!SUCCEEDED(hr))
-			{
-				// Handle the error.
-			}
-
+			RECT title_bar_rect = { 0 };
+			InvalidateRect(hWnd, &title_bar_rect, FALSE);
 			break;
 		}
 		}
@@ -1318,6 +1310,65 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             DragFinish(drop);
             return 0;
         }
+
+		case WM_ACTIVATE:
+		{
+			if (_glfw.hints.window.titlebar)
+				break;
+
+			RECT title_bar_rect = { 0 };
+			InvalidateRect(hWnd, &title_bar_rect, FALSE);
+		}
+
+		case WM_NCHITTEST:
+		{
+			if (_glfw.hints.window.titlebar || !hasThickFrame)
+				break;
+
+			//
+			// Hit test for custom frames
+			//
+			POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+			ScreenToClient(hWnd, &pt);
+
+			// Check borders first
+			if (!window->win32.maximized)
+			{
+				RECT rc;
+				GetClientRect(hWnd, &rc);
+
+				const int verticalBorderSize = GetSystemMetrics(SM_CYFRAME);
+
+				enum { left = 1, top = 2, right = 4, bottom = 8 };
+				int hit = 0;
+				if (pt.x <= border_thickness.left)
+					hit |= left;
+				if (pt.x >= rc.right - border_thickness.right)
+					hit |= right;
+				if (pt.y <= border_thickness.top || pt.y < verticalBorderSize)
+					hit |= top;
+				if (pt.y >= rc.bottom - border_thickness.bottom)
+					hit |= bottom;
+
+				if (hit & top && hit & left)        return HTTOPLEFT;
+				if (hit & top && hit & right)       return HTTOPRIGHT;
+				if (hit & bottom && hit & left)     return HTBOTTOMLEFT;
+				if (hit & bottom && hit & right)    return HTBOTTOMRIGHT;
+				if (hit & left)                     return HTLEFT;
+				if (hit & top)                      return HTTOP;
+				if (hit & right)                    return HTRIGHT;
+				if (hit & bottom)                   return HTBOTTOM;
+			}
+
+			// Then do client-side test which should determine titlebar bounds
+			int titlebarHittest = 0;
+			_glfwInputTitleBarHitTest(window, pt.x, pt.y, &titlebarHittest);
+			if (titlebarHittest)
+				return HTCAPTION;
+
+			// In client area
+			return HTCLIENT;
+		}
     }
 
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
