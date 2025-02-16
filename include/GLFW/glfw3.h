@@ -922,6 +922,15 @@ extern "C" {
  */
 #define GLFW_FOCUS_ON_SHOW          0x0002000C
 
+ /*! @brief Window has titlebar window hint and attribute
+  *
+  *  Window has titlebar [window hint](@ref GLFW_TITLEBAR_hint) and
+  *  [window attribute](@ref GLFW_TITLEBAR_attrib).
+  *
+  *  NOTE: Added Custom
+  */
+#define GLFW_TITLEBAR               0x00C2000D
+
 /*! @brief Mouse input transparency window hint and attribute
  *
  *  Mouse input transparency [window hint](@ref GLFW_MOUSE_PASSTHROUGH_hint) or
@@ -1612,6 +1621,26 @@ typedef void (* GLFWerrorfun)(int error_code, const char* description);
  *  @ingroup window
  */
 typedef void (* GLFWwindowposfun)(GLFWwindow* window, int xpos, int ypos);
+
+/*! @brief The function pointer type for window titlebar hittest callbacks.
+ *
+ *  This is the function pointer type for window titelebar hittest callbacks.
+ *  A window  titlebar hittest callback function has the following signature:
+ *  @code
+ *  void callback_name(GLFWwindow* window, int xpos, int ypos, int* hit)
+ *  @endcode
+ *
+ *  @param[in] window The window that was moved.
+ *  @param[in] xpos The x-coordinate of mouse, in screen coordinates.
+ *  @param[in] ypos The y-coordinate of mouse, in screen coordinates.
+ *  @param[out] hit 'true' or '1' if mouse hovering titlebar.
+ *
+ *  @sa @ref window_pos
+ *  @sa @ref glfwSetTitlebarHitTestCallback
+ *
+ *  @ingroup window
+ */
+typedef void (*GLFWtitlebarhittestfun)(GLFWwindow*, int, int, int*);
 
 /*! @brief The function pointer type for window size callbacks.
  *

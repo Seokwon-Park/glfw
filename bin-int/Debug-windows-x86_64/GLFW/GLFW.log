@@ -1,3 +1,0 @@
-﻿  win32_window.c
-D:\dev\Steins\Steins\vendor\GLFW\src\win32_window.c(1365,4): warning C4013: '_glfwInputTitleBarHitTest' undefined; assuming extern returning int
-  GLFW.vcxproj -> D:\dev\Steins\Steins\vendor\GLFW\bin\Debug-windows-x86_64\GLFW\GLFW.lib

@@ -3,9 +3,8 @@ project "GLFW"
     language "C"
 	staticruntime "on"
 
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("Build/Bin/%{cfg.buildcfg}/%{prj.name}")
+	objdir ("Build/Intermediate/%{cfg.buildcfg}/%{prj.name}")
 
     files
 	{
@@ -15,13 +14,13 @@ project "GLFW"
 		"src/context.c",
 		"src/init.c",
 		"src/input.c",
+		"src/internal.h",
 		"src/monitor.c",
 
 		"src/null_init.c",
 		"src/null_joystick.c",
 		"src/null_monitor.c",
 		"src/null_window.c",
-
 		"src/platform.c",
 		"src/vulkan.c",
 		"src/window.c",
